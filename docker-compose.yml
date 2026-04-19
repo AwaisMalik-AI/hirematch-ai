@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hirematch
+      POSTGRES_PASSWORD: hirematch
+      POSTGRES_DB: hirematch
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hirematch -d hirematch"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://hirematch:hirematch@db:5432/hirematch
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - resume_data:/app/data/resumes
+    command:
+      - sh
+      - -c
+      - |
+        python -c "import asyncio; import app.models.user; import app.models.recruitment; from app.core.database import init_db; asyncio.run(init_db())"
+        exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  worker:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://hirematch:hirematch@db:5432/hirematch
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - resume_data:/app/data/resumes
+    command: celery -A app.tasks.celery_app.celery_app worker --loglevel=INFO
+
+volumes:
+  pgdata:
+  resume_data:
