@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import analytics, auth, candidates, jobs, matching, screening
+from app.api.routes import analytics, auth, candidates, crews, jobs, matching, screening
 from app.core.config import get_settings
 from app.core.database import init_db
 
@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.app_name,
-    description="AI recruitment copilot: resume & JD parsing, explainable matching, screening, outreach.",
+    description="AI recruitment copilot: resume & JD parsing, explainable matching, screening, outreach, and hiring crews.",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -51,6 +51,7 @@ app.include_router(candidates.router, prefix=prefix)
 app.include_router(matching.router, prefix=prefix)
 app.include_router(screening.router, prefix=prefix)
 app.include_router(analytics.router, prefix=prefix)
+app.include_router(crews.router, prefix=prefix)
 
 
 @app.get("/healthz")

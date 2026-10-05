@@ -11,7 +11,7 @@ def _build_celery() -> Celery:
         "hirematch",
         broker=str(s.celery_broker_url),
         backend=str(s.celery_result_backend),
-        include=["app.tasks.processing_tasks"],
+        include=["app.tasks.processing_tasks", "app.tasks.crew_tasks"],
     )
     app.conf.update(
         task_serializer="json",
