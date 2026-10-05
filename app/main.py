@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import analytics, auth, candidates, crews, jobs, matching, screening
+from app.api.routes import analytics, auth, candidates, crews, fairness, jobs, matching, screening
 from app.core.config import get_settings
 from app.core.database import init_db
 
@@ -52,6 +52,7 @@ app.include_router(matching.router, prefix=prefix)
 app.include_router(screening.router, prefix=prefix)
 app.include_router(analytics.router, prefix=prefix)
 app.include_router(crews.router, prefix=prefix)
+app.include_router(fairness.router, prefix=prefix)
 
 
 @app.get("/healthz")

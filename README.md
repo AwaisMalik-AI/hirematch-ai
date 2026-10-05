@@ -2,7 +2,7 @@
 
 **Backend-only, production-style API** for an AI recruitment copilot: resume and job-description parsing, **explainable** semantic + rules-based matching, screening assistance, candidate comparison, and outreach drafting. Configuration is **environment-driven** — no secrets in source control.
 
-**Latest:** Hiring crew (`POST /api/v1/crews/hiring`) — parser → matcher → interviewer with Celery worker `hirematch.run_hiring_crew`.
+**Latest:** Hiring crew plus **fairness / bias audit** (`POST /api/v1/fairness/audit`) for proxy-term and skill-coverage checks.
 
 ---
 
